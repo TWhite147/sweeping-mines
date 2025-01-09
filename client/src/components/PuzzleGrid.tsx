@@ -9,10 +9,12 @@ interface Cell {
 interface PuzzleGridProps {
   grid: number[][];
   onGameEnd: (status: "won" | "lost") => void;
+  totalMines: number;
 }
 
-const PuzzleGrid: React.FC<PuzzleGridProps> = ({ grid, onGameEnd }) => {
+const PuzzleGrid: React.FC<PuzzleGridProps> = ({ grid, onGameEnd, totalMines }) => {
   const [cells, setCells] = useState<Cell[][]>([]);
+  const [mineCount, setMineCount] = useState<number>(0);
 
   useEffect(() => {
     const initialCells = grid.map((row) =>
@@ -101,13 +103,17 @@ const PuzzleGrid: React.FC<PuzzleGridProps> = ({ grid, onGameEnd }) => {
     const cell = newCells[row][col];
 
     if (!cell.revealed) {
+      if (cell.flagged) setMineCount(mineCount - 1);
+      else setMineCount(mineCount+1)  
       cell.flagged = !cell.flagged;
       setCells(newCells);
     }
+
   };
 
   return (
     <div>
+      <div> Total Mines: {`${totalMines}`}; Mines Flagged: {`${mineCount}`} </div>
       {cells.map((row, rowIndex) =>
         row.map((cell, colIndex) => (
           <div

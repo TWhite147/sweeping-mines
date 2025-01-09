@@ -43,7 +43,7 @@ const generatePuzzle = async (ctx) => {
     }
   }
 
-  return ctx.body = { grid };
+  return ctx.body = { grid, mines };
 };
 
 const savePuzzle = async (ctx) => {

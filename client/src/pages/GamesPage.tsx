@@ -15,6 +15,7 @@ const GamesPage: React.FC = () => {
   const [grid, setGrid] = useState<number[][]>([]);
   const [gameStatus, setGameStatus] = useState<"playing" | "won" | "lost">("playing");
   const [difficulty, setDifficulty] = useState<Difficulty>("easy");
+  const [totalMines, setTotalMines] = useState<number>(0);
 
   const startGame = async () => {
     try {
@@ -33,6 +34,7 @@ const GamesPage: React.FC = () => {
       const newGrid = await generatePuzzle(rows, cols, mines);
       setGrid(newGrid);
       setGameStatus("playing");
+      setTotalMines(mines);
     } catch (error) {
       console.error(error);
       alert("Failed to generate puzzle. Please try again later.");
@@ -65,7 +67,7 @@ const GamesPage: React.FC = () => {
       {gameStatus === "won" && <p>You Won! 🎉</p>}
 
       <div>
-        <PuzzleGrid grid={grid} onGameEnd={handleGameEnd} />
+        <PuzzleGrid grid={grid} onGameEnd={handleGameEnd} totalMines={totalMines}/>
       </div>
     </div>
   );
