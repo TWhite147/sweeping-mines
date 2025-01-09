@@ -4,12 +4,12 @@ import { generatePuzzle } from "../services/puzzleService";
 
 const GamesPage: React.FC = () => {
   const [grid, setGrid] = useState<number[][]>([]);
-  const [gameStatus, setGameStatus] = useState<"playing" | "won" | "lost" | null>(null);
+  const [gameStatus, setGameStatus] = useState<"playing" | "won" | "lost" | null>("playing");
 
   const startGame = async () => {
     try {
       const newGrid = await generatePuzzle(8, 8, 10);
-      console.log("Generated grid:", newGrid); 
+      console.log("Generated grid:", newGrid);
       setGrid(newGrid);
       setGameStatus("playing");
     } catch (error) {
@@ -18,31 +18,28 @@ const GamesPage: React.FC = () => {
     }
   };
 
-  const handleGameEnd = (won: boolean) => {
-    if (won) {
-      setGameStatus("won");
-    } else {
-      setGameStatus("lost");
-    }
+  const handleGameEnd = (status: "won" | "lost") => {
+    setGameStatus(status);
   };
 
   return (
     <div>
       <button
         onClick={startGame}
+        className="bg-blue-500 text-white px-4 py-2 rounded"
       >
         Start Game
       </button>
 
-      {gameStatus && (
-        <p>
-          {gameStatus === "won" ? "Congratulations! You won!" : "You lost! Try again."}
-        </p>
-      )}
+      {gameStatus === "lost" && <p className="text-red-500">You Lost! 💥</p>}
+      {gameStatus === "won" && <p className="text-green-500">You Won! 🎉</p>}
 
-      {grid.length > 0 && (
-        <div>
-          <PuzzleGrid grid={grid} onGameEnd={handleGameEnd} />
+      {grid.length > 0 && gameStatus === "playing" && (
+        <div className="mt-4">
+          <PuzzleGrid
+            grid={grid}
+            onGameEnd={handleGameEnd}
+          />
         </div>
       )}
     </div>
