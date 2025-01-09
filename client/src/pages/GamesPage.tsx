@@ -4,25 +4,47 @@ import { generatePuzzle } from "../services/puzzleService";
 
 const GamesPage: React.FC = () => {
   const [grid, setGrid] = useState<number[][]>([]);
+  const [gameStatus, setGameStatus] = useState<"playing" | "won" | "lost" | null>(null);
 
-  const createPuzzle = async () => {
+  const startGame = async () => {
     try {
       const newGrid = await generatePuzzle(8, 8, 10);
       setGrid(newGrid);
+      setGameStatus("playing");
+      console.log(gameStatus) 
     } catch (error) {
       console.error(error);
       alert("Failed to generate puzzle. Please try again later.");
     }
   };
 
+  const handleGameEnd = (won: boolean) => {
+    if (won) {
+      setGameStatus("won");
+    } else {
+      setGameStatus("lost");
+    }
+  };
+
   return (
     <div>
-      <button onClick={createPuzzle}>
-        Generate Puzzle
+      <button
+        onClick={startGame}
+      >
+        Start Game
       </button>
-      <div>
-        {grid.length > 0 && <PuzzleGrid grid={grid} />}
-      </div>
+
+      {gameStatus && (
+        <p>
+          {gameStatus === "won" ? "Congratulations! You won!" : "You lost! Try again."}
+        </p>
+      )}
+
+      {grid.length > 0 && (
+        <div>
+          <PuzzleGrid grid={grid} onGameEnd={handleGameEnd} />
+        </div>
+      )}
     </div>
   );
 };

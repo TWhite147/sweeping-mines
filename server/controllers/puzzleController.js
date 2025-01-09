@@ -16,8 +16,34 @@ const generatePuzzle = async (ctx) => {
       minesPlaced++;
     }
   }
+  const directions = [
+    [-1, -1], [-1, 0], [-1, 1],
+    [0, -1], [0, 1],
+    [1, -1], [1, 0], [1, 1],
+  ];
 
-  ctx.body = { grid };
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      if (grid[r][c] === -1) continue;
+
+      let mineCount = 0;
+
+      for (const [dr, dc] of directions) {
+        const newRow = r + dr;
+        const newCol = c + dc;
+
+        if (newRow >= 0 && newRow < rows && newCol >= 0 && newCol < cols) {
+          if (grid[newRow][newCol] === -1) {
+            mineCount++;
+          }
+        }
+      }
+
+      grid[r][c] = mineCount;
+    }
+  }
+
+  return ctx.body = { grid };
 };
 
 const savePuzzle = async (ctx) => {
@@ -29,10 +55,9 @@ const savePuzzle = async (ctx) => {
     state,
     difficulty,
     timeSpent,
-    createdAt: new Date(),
   });
 
-  ctx.body = { message: "Puzzle saved successfully", id: result.insertedId };
+  return ctx.body = { message: "Puzzle saved successfully", id: result.insertedId };
 };
 
 const getUserPuzzles = async (ctx) => {
@@ -40,7 +65,7 @@ const getUserPuzzles = async (ctx) => {
   const db = getDb();
 
   const puzzles = await db.collection("puzzles").find({ userId }).toArray();
-  ctx.body = puzzles;
+  return ctx.body = puzzles;
 };
 
 module.exports = { generatePuzzle, savePuzzle, getUserPuzzles };
