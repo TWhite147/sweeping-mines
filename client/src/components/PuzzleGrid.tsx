@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 interface Cell {
   value: number; 
@@ -7,42 +7,59 @@ interface Cell {
 }
 
 interface PuzzleGridProps {
-  grid: number[][]; 
+  grid: number[][];
   onGameEnd: (won: boolean) => void; 
 }
 
 const PuzzleGrid: React.FC<PuzzleGridProps> = ({ grid, onGameEnd }) => {
-  const [cells, setCells] = useState<Cell[][]>(
-    grid.map((row) =>
+  const [cells, setCells] = useState<Cell[][]>([]);
+
+  useEffect(() => {
+    const initialCells = grid.map((row) =>
       row.map((value) => ({
         value,
         revealed: false,
         flagged: false,
       }))
-    )
-  );
+    );
+    setCells(initialCells);
+  }, [grid]);
 
   const revealCell = (row: number, col: number) => {
     const newCells = [...cells];
     const cell = newCells[row][col];
 
-    if (cell.revealed || cell.flagged) return;
+    if (cell.revealed || cell.flagged) return; 
 
     cell.revealed = true;
 
     if (cell.value === -1) {
-      onGameEnd(true);
-    } else {
-      if (cell.value === 0) {
-        revealAdjacent(newCells, row, col);
-      }
+      revealAllMines(newCells);
+      setCells(newCells);
+      onGameEnd(false);
+      return;
+    }
 
-      if (checkWin(newCells)) {
-        onGameEnd(true);
-      }
+    if (cell.value === 0) {
+      revealAdjacent(newCells, row, col);
+    }
+
+    if (checkWin(newCells)) {
+      onGameEnd(true);
+      return;
     }
 
     setCells(newCells);
+  };
+
+  const revealAllMines = (grid: Cell[][]) => {
+    grid.forEach((row) =>
+      row.forEach((cell) => {
+        if (cell.value === -1) {
+          cell.revealed = true;
+        }
+      })
+    );
   };
 
   const revealAdjacent = (grid: Cell[][], row: number, col: number) => {
@@ -80,7 +97,7 @@ const PuzzleGrid: React.FC<PuzzleGridProps> = ({ grid, onGameEnd }) => {
   };
 
   const toggleFlag = (e: React.MouseEvent, row: number, col: number) => {
-    e.preventDefault();
+    e.preventDefault(); 
 
     const newCells = [...cells];
     const cell = newCells[row][col];
@@ -92,7 +109,7 @@ const PuzzleGrid: React.FC<PuzzleGridProps> = ({ grid, onGameEnd }) => {
   };
 
   return (
-    <div style={{ gridTemplateColumns: `repeat(${grid[0].length}, 1fr)` }}>
+    <div>
       {cells.map((row, rowIndex) =>
         row.map((cell, colIndex) => (
           <div
@@ -104,11 +121,11 @@ const PuzzleGrid: React.FC<PuzzleGridProps> = ({ grid, onGameEnd }) => {
               ? cell.value === -1
                 ? "💣"
                 : cell.value > 0
-                  ? cell.value
-                  : ""
+                ? cell.value
+                : ""
               : cell.flagged
-                ? "🚩"
-                : ""}
+              ? "🚩"
+              : "⬜"}
           </div>
         ))
       )}

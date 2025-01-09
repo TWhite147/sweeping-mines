@@ -9,9 +9,9 @@ const GamesPage: React.FC = () => {
   const startGame = async () => {
     try {
       const newGrid = await generatePuzzle(8, 8, 10);
+      console.log("Generated grid:", newGrid); 
       setGrid(newGrid);
       setGameStatus("playing");
-      console.log(gameStatus) 
     } catch (error) {
       console.error(error);
       alert("Failed to generate puzzle. Please try again later.");
