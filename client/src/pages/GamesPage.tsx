@@ -8,7 +8,7 @@ const difficultySettings: Record<Difficulty, { rows: number; cols: number; mines
   easy: { rows: 8, cols: 8, mines: 10 },
   medium: { rows: 16, cols: 16, mines: 40 },
   hard: { rows: 24, cols: 24, mines: 99 },
-  custom: { rows: 0, cols: 0, mines: 0 }, 
+  custom: { rows: 0, cols: 0, mines: 0 },
 };
 
 const GamesPage: React.FC = () => {
@@ -43,6 +43,9 @@ const GamesPage: React.FC = () => {
 
   const handleGameEnd = (status: "won" | "lost") => {
     setGameStatus(status);
+    if (gameStatus === "won") {
+
+    }
   };
 
   return (
@@ -67,7 +70,7 @@ const GamesPage: React.FC = () => {
       {gameStatus === "won" && <p>You Won! 🎉</p>}
 
       <div>
-        <PuzzleGrid grid={grid} onGameEnd={handleGameEnd} totalMines={totalMines}/>
+        <PuzzleGrid grid={grid} onGameEnd={handleGameEnd} totalMines={totalMines} />
       </div>
     </div>
   );

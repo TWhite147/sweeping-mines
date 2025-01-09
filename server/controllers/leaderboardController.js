@@ -10,8 +10,7 @@ const getLeaderboard = async (ctx) => {
     .sort({ time: 1 })
     .limit(10)
     .toArray();
-
-  ctx.body = leaderboard;
+  return ctx.body = leaderboard;
 };
 
 const saveScore = async (ctx) => {
@@ -22,10 +21,9 @@ const saveScore = async (ctx) => {
     username,
     time,
     difficulty,
-    createdAt: new Date(),
   });
 
-  ctx.body = { message: "Score saved successfully" };
+  return ctx.body = { message: "Score saved successfully" };
 };
 
 module.exports = { getLeaderboard, saveScore };
