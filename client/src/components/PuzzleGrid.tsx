@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 interface Cell {
-  value: number; // -1 for mines, 0-8 for other cells
+  value: number;
   revealed: boolean;
   flagged: boolean;
 }
@@ -15,7 +15,6 @@ const PuzzleGrid: React.FC<PuzzleGridProps> = ({ grid, onGameEnd }) => {
   const [cells, setCells] = useState<Cell[][]>([]);
 
   useEffect(() => {
-    // Initialize cells from grid
     const initialCells = grid.map((row) =>
       row.map((value) => ({
         value,
@@ -30,17 +29,17 @@ const PuzzleGrid: React.FC<PuzzleGridProps> = ({ grid, onGameEnd }) => {
     const newCells = [...cells];
     const cell = newCells[row][col];
 
-    if (cell.revealed || cell.flagged) return; // Ignore clicks on revealed/flagged cells
+    if (cell.revealed || cell.flagged) return;
 
     cell.revealed = true;
 
     if (cell.value === -1) {
-      // Player clicked on a mine
+      revealAllMines(newCells);
       onGameEnd("lost");
     } else {
-      // Reveal cell and check win condition
       revealAdjacent(newCells, row, col);
       if (checkWinCondition(newCells)) {
+        revealAllMines(newCells);
         onGameEnd("won");
       }
     }
@@ -51,7 +50,7 @@ const PuzzleGrid: React.FC<PuzzleGridProps> = ({ grid, onGameEnd }) => {
   const revealAdjacent = (grid: Cell[][], row: number, col: number) => {
     const directions = [
       [-1, -1], [-1, 0], [-1, 1],
-      [0, -1],          [0, 1],
+      [0, -1], [0, 1],
       [1, -1], [1, 0], [1, 1],
     ];
 
@@ -77,7 +76,6 @@ const PuzzleGrid: React.FC<PuzzleGridProps> = ({ grid, onGameEnd }) => {
   };
 
   const checkWinCondition = (grid: Cell[][]): boolean => {
-    // Win if all non-mine cells are revealed
     for (const row of grid) {
       for (const cell of row) {
         if (!cell.revealed && cell.value !== -1) {
@@ -88,8 +86,16 @@ const PuzzleGrid: React.FC<PuzzleGridProps> = ({ grid, onGameEnd }) => {
     return true;
   };
 
+  const revealAllMines = (grid: Cell[][]) => {
+    grid.forEach((row) =>
+      row.forEach((cell) => {
+          cell.revealed = true;
+      })
+    );
+  };
+
   const toggleFlag = (e: React.MouseEvent, row: number, col: number) => {
-    e.preventDefault(); // Prevent context menu
+    e.preventDefault();
 
     const newCells = [...cells];
     const cell = newCells[row][col];
@@ -101,18 +107,11 @@ const PuzzleGrid: React.FC<PuzzleGridProps> = ({ grid, onGameEnd }) => {
   };
 
   return (
-    <div className="grid gap-1" style={{ gridTemplateColumns: `repeat(${grid[0].length}, 1fr)` }}>
+    <div>
       {cells.map((row, rowIndex) =>
         row.map((cell, colIndex) => (
           <div
             key={`${rowIndex}-${colIndex}`}
-            className={`border h-10 w-10 flex items-center justify-center text-center ${
-              cell.revealed
-                ? cell.value === -1
-                  ? "bg-red-500 text-white" // Mine
-                  : "bg-gray-200"
-                : "bg-gray-500"
-            }`}
             onClick={() => revealCell(rowIndex, colIndex)}
             onContextMenu={(e) => toggleFlag(e, rowIndex, colIndex)}
           >
