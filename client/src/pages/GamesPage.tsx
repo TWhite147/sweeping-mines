@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import PuzzleGrid from "../components/PuzzleGrid";
 import { generatePuzzle } from "../services/puzzleService";
+import { saveScore } from "../services/leaderboardService";
 
 type Difficulty = "easy" | "medium" | "hard" | "custom";
 
@@ -16,6 +17,10 @@ const GamesPage: React.FC = () => {
   const [gameStatus, setGameStatus] = useState<"playing" | "won" | "lost">("playing");
   const [difficulty, setDifficulty] = useState<Difficulty>("easy");
   const [totalMines, setTotalMines] = useState<number>(0);
+  const [elapsedTime, setElapsedTime] = useState<number>(0);
+  const [username, setUsername] = useState<string>("");
+
+  const timerRef = useRef<NodeJS.Timeout | null>(null); 
 
   const startGame = async () => {
     try {
@@ -33,18 +38,36 @@ const GamesPage: React.FC = () => {
 
       const newGrid = await generatePuzzle(rows, cols, mines);
       setGrid(newGrid);
+      console.log(newGrid);
+      
       setGameStatus("playing");
       setTotalMines(mines);
+      setElapsedTime(0);
+      if (timerRef.current) clearInterval(timerRef.current); 
+      timerRef.current = setInterval(() => {
+        setElapsedTime((prev) => prev + 1);
+      }, 1000);
     } catch (error) {
       console.error(error);
       alert("Failed to generate puzzle. Please try again later.");
     }
   };
 
-  const handleGameEnd = (status: "won" | "lost") => {
+  const handleGameEnd = async (status: "won" | "lost") => {
     setGameStatus(status);
-    if (gameStatus === "won") {
+    if (timerRef.current) clearInterval(timerRef.current); 
 
+    if (status === "won") {
+      try {
+        await saveScore({
+          username,
+          difficulty,
+          timeTaken: elapsedTime,
+        });
+        alert("Score submitted successfully!");
+      } catch (error) {
+        console.error("Failed to submit score:", error);
+      }
     }
   };
 
@@ -64,12 +87,25 @@ const GamesPage: React.FC = () => {
         </div>
       </div>
 
+      <div>
+        <label>
+          Username:
+          <input
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="Enter your username"
+          />
+        </label>
+      </div>
+
       <button onClick={startGame}>Start Game</button>
 
       {gameStatus === "lost" && <p>You Lost! 💥</p>}
       {gameStatus === "won" && <p>You Won! 🎉</p>}
 
       <div>
+        <p>Elapsed Time: {elapsedTime} seconds</p>
         <PuzzleGrid grid={grid} onGameEnd={handleGameEnd} totalMines={totalMines} />
       </div>
     </div>

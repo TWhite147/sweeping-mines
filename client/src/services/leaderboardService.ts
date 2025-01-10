@@ -11,23 +11,20 @@ export const getLeaderboard = async (difficulty: string): Promise<any[]> => {
   return data;
 };
 
-export const saveScore = async (
-  username: string,
-  time: bigint,
-  difficulty: string
-): Promise<{ message: string; id: string }> => {
-  const response = await fetch("http://localhost:3000/leaderboard/save", {
+export const saveScore = async (data: {
+  username: string;
+  difficulty: string;
+  timeTaken: number;
+}) => {
+  const response = await fetch("http://localhost:3000/leaderboard", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ username, time, difficulty}),
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to save puzzle: ${response.statusText}`);
+    throw new Error("Failed to submit score");
   }
 
-  const data = await response.json();
-  return data;
+  return response.json();
 };

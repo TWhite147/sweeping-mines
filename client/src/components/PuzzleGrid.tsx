@@ -25,6 +25,7 @@ const PuzzleGrid: React.FC<PuzzleGridProps> = ({ grid, onGameEnd, totalMines }) 
       }))
     );
     setCells(initialCells);
+    setMineCount(0);
   }, [grid]);
 
   const revealCell = (row: number, col: number) => {
@@ -39,10 +40,11 @@ const PuzzleGrid: React.FC<PuzzleGridProps> = ({ grid, onGameEnd, totalMines }) 
       revealAllMines(newCells);
       onGameEnd("lost");
     } else {
-      revealAdjacent(newCells, row, col);
+      if(cell.value ===0) revealAdjacent(newCells, row, col);
       if (checkWinCondition(newCells)) {
         revealAllMines(newCells);
         onGameEnd("won");
+        setMineCount(0);
       }
     }
 
@@ -66,7 +68,8 @@ const PuzzleGrid: React.FC<PuzzleGridProps> = ({ grid, onGameEnd, totalMines }) 
         newCol >= 0 &&
         newCol < grid[0].length &&
         !grid[newRow][newCol].revealed &&
-        !grid[newRow][newCol].flagged
+        !grid[newRow][newCol].flagged &&
+        !(grid[newRow][newCol].value === -1)
       ) {
         grid[newRow][newCol].revealed = true;
 
@@ -92,6 +95,7 @@ const PuzzleGrid: React.FC<PuzzleGridProps> = ({ grid, onGameEnd, totalMines }) 
     grid.forEach((row) =>
       row.forEach((cell) => {
           cell.revealed = true;
+          cell.flagged = false;
       })
     );
   };

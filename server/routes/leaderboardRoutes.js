@@ -4,6 +4,6 @@ const { getLeaderboard, saveScore } = require("../controllers/leaderboardControl
 const router = new Router({ prefix: "/leaderboard" });
 
 router.get("/", getLeaderboard);
-router.post("/save", saveScore);
+router.post("/", saveScore);
 
 module.exports = router;
