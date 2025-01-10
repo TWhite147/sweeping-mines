@@ -40,7 +40,7 @@ const PuzzleGrid: React.FC<PuzzleGridProps> = ({ grid, onGameEnd, totalMines }) 
       revealAllMines(newCells);
       onGameEnd("lost");
     } else {
-      if(cell.value ===0) revealAdjacent(newCells, row, col);
+      if (cell.value === 0) revealAdjacent(newCells, row, col);
       if (checkWinCondition(newCells)) {
         revealAllMines(newCells);
         onGameEnd("won");
@@ -94,8 +94,8 @@ const PuzzleGrid: React.FC<PuzzleGridProps> = ({ grid, onGameEnd, totalMines }) 
   const revealAllMines = (grid: Cell[][]) => {
     grid.forEach((row) =>
       row.forEach((cell) => {
-          cell.revealed = true;
-          cell.flagged = false;
+        cell.revealed = true;
+        cell.flagged = false;
       })
     );
   };
@@ -108,35 +108,58 @@ const PuzzleGrid: React.FC<PuzzleGridProps> = ({ grid, onGameEnd, totalMines }) 
 
     if (!cell.revealed) {
       if (cell.flagged) setMineCount(mineCount - 1);
-      else setMineCount(mineCount+1)  
+      else setMineCount(mineCount + 1);
       cell.flagged = !cell.flagged;
       setCells(newCells);
     }
-
   };
 
   return (
     <div>
-      <div> Total Mines: {`${totalMines}`}; Mines Flagged: {`${mineCount}`} </div>
-      {cells.map((row, rowIndex) =>
-        row.map((cell, colIndex) => (
-          <div
-            key={`${rowIndex}-${colIndex}`}
-            onClick={() => revealCell(rowIndex, colIndex)}
-            onContextMenu={(e) => toggleFlag(e, rowIndex, colIndex)}
-          >
-            {cell.revealed
-              ? cell.value === -1
-                ? "💣"
-                : cell.value > 0
-                ? cell.value
-                : "⬛"
-              : cell.flagged
-              ? "🚩"
-              : "⬜"}
-          </div>
-        ))
-      )}
+      <div>
+        Total Mines: {totalMines}; Mines Flagged: {mineCount}
+      </div>
+      <div
+        className="grid gap-1 bg-gray-200 p-2 rounded-md"
+        style={{
+          gridTemplateColumns: `repeat(${grid[0]?.length || 0}, 1fr)`,
+          display: "grid",
+        }}
+      >
+        {cells.map((row, rowIndex) =>
+          row.map((cell, colIndex) => (
+            <div
+              key={`${rowIndex}-${colIndex}`}
+              onClick={() => revealCell(rowIndex, colIndex)}
+              onContextMenu={(e) => toggleFlag(e, rowIndex, colIndex)}
+              style={{
+                width: "40px",
+                height: "40px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                border: "1px solid #ddd",
+                backgroundColor: cell.revealed
+                  ? cell.value === -1
+                    ? "red"
+                    : "lightgray"
+                  : "white",
+                cursor: "pointer",
+              }}
+            >
+              {cell.revealed
+                ? cell.value === -1
+                  ? "💣"
+                  : cell.value > 0
+                  ? cell.value
+                  : ""
+                : cell.flagged
+                ? "🚩"
+                : ""}
+            </div>
+          ))
+        )}
+      </div>
     </div>
   );
 };

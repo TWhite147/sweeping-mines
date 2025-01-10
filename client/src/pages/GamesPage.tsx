@@ -6,9 +6,9 @@ import { saveScore } from "../services/leaderboardService";
 type Difficulty = "easy" | "medium" | "hard" | "custom";
 
 const difficultySettings: Record<Difficulty, { rows: number; cols: number; mines: number }> = {
-  easy: { rows: 8, cols: 8, mines: 10 },
+  easy: { rows: 9, cols: 9, mines: 10 },
   medium: { rows: 16, cols: 16, mines: 40 },
-  hard: { rows: 24, cols: 24, mines: 99 },
+  hard: { rows: 30, cols: 16, mines: 99 },
   custom: { rows: 0, cols: 0, mines: 0 },
 };
 
@@ -57,7 +57,7 @@ const GamesPage: React.FC = () => {
     setGameStatus(status);
     if (timerRef.current) clearInterval(timerRef.current);
 
-    if (status === "won") {
+    if (status === "won" && difficulty !== "custom") {
       try {
         await saveScore({
           username,
@@ -74,17 +74,23 @@ const GamesPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-green-100 text-gray-800 p-8">
       <div className="text-4xl font-bold mb-6 text-center">
-        <h1 className="flex justify-center mb-4">Select Difficulty</h1>
-        <div>
-          {Object.keys(difficultySettings).map((level) => (
-            <button className={`px-4 py-2 mx-2 rounded ${difficulty === level ? "bg-blue-500 text-white" : "bg-gray-300"
-              } hover:bg-blue-400`}
-              key={level}
-              onClick={() => setDifficulty(level as Difficulty)}
-            >
-              {level.charAt(0).toUpperCase() + level.slice(1)}
-            </button>
-          ))}
+        <h1>Select Difficulty</h1>
+        <div className="my-4">
+          <label htmlFor="difficulty" className="text-lg font-medium">
+            Difficulty:
+          </label>
+          <select
+            id="difficulty"
+            value={difficulty}
+            onChange={(e) => setDifficulty(e.target.value as Difficulty)}
+            className="border rounded-lg p-2 ml-2 bg-white text-gray-800"
+          >
+            {Object.keys(difficultySettings).map((level) => (
+              <option key={level} value={level}>
+                {level.charAt(0).toUpperCase() + level.slice(1)}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 
@@ -101,10 +107,15 @@ const GamesPage: React.FC = () => {
         </label>
       </div>
 
-      <button onClick={startGame} className="px-6 py-3 bg-blue-500 text-white font-medium rounded-lg hover:bg-blue-600 transition">Start Game</button>
+      <button
+        onClick={startGame}
+        className="px-6 py-3 bg-blue-500 text-white font-medium rounded-lg hover:bg-blue-600 transition"
+      >
+        Start Game
+      </button>
 
-      {gameStatus === "lost" && <p className="text-red-500 font-bold">You Lost! 💥</p>}
-      {gameStatus === "won" && <p className="text-green-500 font-bold">You Won! 🎉</p>}
+      {gameStatus === "lost" && <p className="text-red-500 font-bold mt-4">You Lost! 💥</p>}
+      {gameStatus === "won" && <p className="text-green-500 font-bold mt-4">You Won! 🎉</p>}
 
       <div className="text-center mb-6">
         <p className="text-lg">Elapsed Time: {elapsedTime} seconds</p>
