@@ -14,7 +14,7 @@ export const getLeaderboard = async (difficulty: string): Promise<any[]> => {
 export const saveScore = async (data: {
   username: string;
   difficulty: string;
-  timeTaken: number;
+  time: number;
 }) => {
   const response = await fetch("http://localhost:3000/leaderboard", {
     method: "POST",

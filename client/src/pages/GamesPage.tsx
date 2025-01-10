@@ -62,7 +62,7 @@ const GamesPage: React.FC = () => {
         await saveScore({
           username,
           difficulty,
-          timeTaken: elapsedTime,
+          time: elapsedTime,
         });
         alert("Score submitted successfully!");
       } catch (error) {
