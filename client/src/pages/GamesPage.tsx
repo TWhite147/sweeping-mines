@@ -20,7 +20,7 @@ const GamesPage: React.FC = () => {
   const [elapsedTime, setElapsedTime] = useState<number>(0);
   const [username, setUsername] = useState<string>("");
 
-  const timerRef = useRef<NodeJS.Timeout | null>(null); 
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const startGame = async () => {
     try {
@@ -39,11 +39,11 @@ const GamesPage: React.FC = () => {
       const newGrid = await generatePuzzle(rows, cols, mines);
       setGrid(newGrid);
       console.log(newGrid);
-      
+
       setGameStatus("playing");
       setTotalMines(mines);
       setElapsedTime(0);
-      if (timerRef.current) clearInterval(timerRef.current); 
+      if (timerRef.current) clearInterval(timerRef.current);
       timerRef.current = setInterval(() => {
         setElapsedTime((prev) => prev + 1);
       }, 1000);
@@ -55,7 +55,7 @@ const GamesPage: React.FC = () => {
 
   const handleGameEnd = async (status: "won" | "lost") => {
     setGameStatus(status);
-    if (timerRef.current) clearInterval(timerRef.current); 
+    if (timerRef.current) clearInterval(timerRef.current);
 
     if (status === "won") {
       try {
@@ -72,12 +72,13 @@ const GamesPage: React.FC = () => {
   };
 
   return (
-    <div>
-      <div>
-        <h1>Select Difficulty</h1>
+    <div className="min-h-screen bg-green-100 text-gray-800 p-8">
+      <div className="text-4xl font-bold mb-6 text-center">
+        <h1 className="flex justify-center mb-4">Select Difficulty</h1>
         <div>
           {Object.keys(difficultySettings).map((level) => (
-            <button
+            <button className={`px-4 py-2 mx-2 rounded ${difficulty === level ? "bg-blue-500 text-white" : "bg-gray-300"
+              } hover:bg-blue-400`}
               key={level}
               onClick={() => setDifficulty(level as Difficulty)}
             >
@@ -87,7 +88,7 @@ const GamesPage: React.FC = () => {
         </div>
       </div>
 
-      <div>
+      <div className="flex justify-center mb-6">
         <label>
           Username:
           <input
@@ -95,18 +96,21 @@ const GamesPage: React.FC = () => {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             placeholder="Enter your username"
+            className="border px-4 py-2 rounded-lg w-1/2"
           />
         </label>
       </div>
 
-      <button onClick={startGame}>Start Game</button>
+      <button onClick={startGame} className="px-6 py-3 bg-blue-500 text-white font-medium rounded-lg hover:bg-blue-600 transition">Start Game</button>
 
-      {gameStatus === "lost" && <p>You Lost! 💥</p>}
-      {gameStatus === "won" && <p>You Won! 🎉</p>}
+      {gameStatus === "lost" && <p className="text-red-500 font-bold">You Lost! 💥</p>}
+      {gameStatus === "won" && <p className="text-green-500 font-bold">You Won! 🎉</p>}
 
-      <div>
-        <p>Elapsed Time: {elapsedTime} seconds</p>
-        <PuzzleGrid grid={grid} onGameEnd={handleGameEnd} totalMines={totalMines} />
+      <div className="text-center mb-6">
+        <p className="text-lg">Elapsed Time: {elapsedTime} seconds</p>
+        <div className="flex justify-center">
+          <PuzzleGrid grid={grid} onGameEnd={handleGameEnd} totalMines={totalMines} />
+        </div>
       </div>
     </div>
   );
