@@ -3,7 +3,6 @@ const bodyParser = require("koa-bodyparser");
 const cors = require("@koa/cors");
 const puzzleRoutes = require("./routes/puzzleRoutes");
 const leaderboardRoutes = require("./routes/leaderboardRoutes");
-const userRoutes = require("./routes/userRoutes");
 const { connectToDatabase } = require("./config/db");
 
 const app = new Koa();
@@ -14,7 +13,6 @@ app.use(cors(config));
 
 app.use(puzzleRoutes.routes());
 app.use(leaderboardRoutes.routes());
-app.use(userRoutes.routes());
 
 connectToDatabase()
   .then(() => {

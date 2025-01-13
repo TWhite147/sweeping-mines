@@ -31,14 +31,23 @@ const GamesPage: React.FC = () => {
       let mines = settings.mines;
 
       if (difficulty === "custom") {
-        rows = parseInt(prompt("Enter number of rows:", "10") || "10", 10);
-        cols = parseInt(prompt("Enter number of columns:", "10") || "10", 10);
+        rows = parseInt(prompt("Enter number of rows (maximum of 100):", "10") || "10", 10);
+        cols = parseInt(prompt("Enter number of columns (maximum of 100):", "10") || "10", 10);
         mines = parseInt(prompt("Enter number of mines:", "10") || "10", 10);
+
+        if (rows <= 0 || cols <= 0 || mines <= 0 || rows > 100 || cols > 100) {
+          alert("Invalid input! Rows, columns, and mines must all be positive numbers. Maximum number of rows and columns is also 100");
+          return;
+        }
+
+        if (mines >= rows * cols) {
+          alert("Too many mines! There must be at least one non-mine cell.");
+          return;
+        }
       }
 
       const newGrid = await generatePuzzle(rows, cols, mines);
       setGrid(newGrid);
-      console.log(newGrid);
 
       setGameStatus("playing");
       setTotalMines(mines);
@@ -72,54 +81,55 @@ const GamesPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-green-100 text-gray-800 p-8">
-      <div className="text-4xl font-bold mb-6 text-center">
-        <h1>Select Difficulty</h1>
-        <div className="my-4">
-          <label htmlFor="difficulty" className="text-lg font-medium">
-            Difficulty:
-          </label>
-          <select
-            id="difficulty"
-            value={difficulty}
-            onChange={(e) => setDifficulty(e.target.value as Difficulty)}
-            className="border rounded-lg p-2 ml-2 bg-white text-gray-800"
+    <div className="min-h-screen bg-green-100 text-gray-800 p-8 flex flex-col items-center">
+      <div className="text-4xl font-bold mb-6 text-center">Select Difficulty</div>
+      <div className="w-full max-w-md">
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="difficulty" className="block text-lg font-medium mb-2">
+              Difficulty:
+            </label>
+            <select
+              id="difficulty"
+              value={difficulty}
+              onChange={(e) => setDifficulty(e.target.value as Difficulty)}
+              className="border rounded-lg p-2 w-full bg-white text-gray-800"
+            >
+              {Object.keys(difficultySettings).map((level) => (
+                <option key={level} value={level}>
+                  {level.charAt(0).toUpperCase() + level.slice(1)}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label htmlFor="username" className="block text-lg font-medium mb-2">
+              Username:
+            </label>
+            <input
+              id="username"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Enter your username"
+              className="border rounded-lg p-2 w-full"
+            />
+          </div>
+          <button
+            onClick={startGame}
+            className="w-full px-6 py-3 bg-blue-500 text-white font-medium rounded-lg hover:bg-blue-600 transition"
           >
-            {Object.keys(difficultySettings).map((level) => (
-              <option key={level} value={level}>
-                {level.charAt(0).toUpperCase() + level.slice(1)}
-              </option>
-            ))}
-          </select>
+            Start Game
+          </button>
         </div>
       </div>
-
-      <div className="flex justify-center mb-6">
-        <label>
-          Username:
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder="Enter your username"
-            className="border px-4 py-2 rounded-lg w-1/2"
-          />
-        </label>
-      </div>
-
-      <button
-        onClick={startGame}
-        className="px-6 py-3 bg-blue-500 text-white font-medium rounded-lg hover:bg-blue-600 transition"
-      >
-        Start Game
-      </button>
 
       {gameStatus === "lost" && <p className="text-red-500 font-bold mt-4">You Lost! 💥</p>}
       {gameStatus === "won" && <p className="text-green-500 font-bold mt-4">You Won! 🎉</p>}
 
-      <div className="text-center mb-6">
+      <div className="text-center mb-6 mt-8">
         <p className="text-lg">Elapsed Time: {elapsedTime} seconds</p>
-        <div className="flex justify-center">
+        <div className="flex justify-center mt-4">
           <PuzzleGrid grid={grid} onGameEnd={handleGameEnd} totalMines={totalMines} />
         </div>
       </div>
