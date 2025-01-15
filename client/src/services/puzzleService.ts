@@ -36,16 +36,3 @@ export const savePuzzle = async (
   const data = await response.json();
   return data;
 };
-
-export const getUserPuzzles = async (userId: string): Promise<any[]> => {
-  const response = await fetch(`http://localhost:3000/puzzles/${userId}`, {
-    method: "GET",
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch user puzzles: ${response.statusText}`);
-  }
-
-  const data = await response.json();
-  return data;
-};

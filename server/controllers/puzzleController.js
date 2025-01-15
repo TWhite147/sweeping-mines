@@ -60,12 +60,4 @@ const savePuzzle = async (ctx) => {
   return ctx.body = { message: "Puzzle saved successfully", id: result.insertedId };
 };
 
-const getUserPuzzles = async (ctx) => {
-  const { userId } = ctx.params;
-  const db = getDb();
-
-  const puzzles = await db.collection("puzzles").find({ userId }).toArray();
-  return ctx.body = puzzles;
-};
-
-module.exports = { generatePuzzle, savePuzzle, getUserPuzzles };
+module.exports = { generatePuzzle, savePuzzle};
